@@ -16,7 +16,7 @@ def parseData(fname):
 
 print("Reading data...")
 # Download from http://jmcauley.ucsd.edu/cse255/data/beer/beer_50000.json"
-data = list(parseData("data/beer/beer_50000.json"))
+data = list(parseData("data/beer_50000.json"))
 print("done")
 
 
