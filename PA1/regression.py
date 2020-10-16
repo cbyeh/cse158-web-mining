@@ -1,6 +1,7 @@
 import numpy as np
 import json
 import ast
+import matplotlib.pyplot as plt
 
 
 def _parse_data(fname):
@@ -16,6 +17,23 @@ print("Reading data...")
 data_list = list(_parse_data('data/fantasy_10000.json'))
 print("Done")
 data = np.array(data_list)
+
+
+"""Begin question 1"""
+
+# Plot star ratings and relationship with length
+x = [len(d['review_text']) for d in data]
+y = [d['rating'] for d in data]  # Ratings
+plt.scatter(x, y)
+# plt.show()
+
+# Number of 0, 1, ..., 5 star ratings
+zero_star_ratings = len([rating for rating in y if rating == 0])  # 326
+one_star_ratings = len([rating for rating in y if rating == 1])  # 286
+two_star_ratings = len([rating for rating in y if rating == 2])  # 778
+three_star_ratings = len([rating for rating in y if rating == 3])  # 2113
+four_star_ratings = len([rating for rating in y if rating == 4])  # 3265
+five_star_ratings = len([rating for rating in y if rating == 5])  # 3232
 
 
 """Begin question 2"""
@@ -93,7 +111,6 @@ mse = sum / len(data)  # 1.549835169277462, slightly better
 # Find maximum review length
 reviews = [len(d['review_text']) for d in data]
 max_length = np.max(reviews)  # amax
-print(max_length)
 
 
 def _text_length_poly_feature(datum, degree):
@@ -138,4 +155,40 @@ mse = sum / len(data)
 # Degree 3: 1.5497985323805497
 # 4: 1.549629132452472
 # 5: 1.5496142023298662
-print(mse)
+
+
+"""Begin question 5"""
+
+# Split the data
+np.random.shuffle(data)  # Randomize order of data
+training_data = data[:len(data) // 2]  # First half
+testing_data = data[len(data) // 2:]  # Second half
+
+# Train a predictor to estimate rating from review length
+x = [_text_length_poly_feature(d, 5)
+     for d in training_data]  # Vector of 1, review length with degree 5
+y = [d['rating'] for d in training_data]  # Ratings
+theta, residuals, rank, s = np.linalg.lstsq(x, y)  # Solve matrix equation
+
+# Degree 3: [3.65398022  2.85740482  -8.6349972   7.03106877]
+# 4: [3.65538388  2.70313039  -4.77004286  -8.0607224  11.03884403]
+# 5: [3.66726222  2.44067015  -12.01072447  41.08045065  -67.57729633  35.98020285]
+
+# Calculate MSE
+sum_training = 0
+sum_testing = 0
+y_testing = [d['rating'] for d in testing_data]
+for i in range(len(training_data)):
+    sum_training += (_new_regression_eq
+                     (theta,
+                      len(training_data[i]['review_text'])) - y[i]) ** 2
+    sum_testing += (_new_regression_eq
+                    (theta,
+                     len(testing_data[i]['review_text'])) - y[i]) ** 2
+mse_training = sum_training / len(training_data)
+mse_testing = sum_testing / len(testing_data)
+# Training and testing error (varies due to random datasets):
+# Note that for these results, the dataset was re-randomized
+# Degree 3: 1.5516115542413098 (training), 1.5659240213323633 (testing)
+# 4: 1.5604723081811585 (training), 1.5792144817011526 (testing)
+# 5: 1.5200201662189214 (training), 1.5308161745889985 (testing)
