@@ -55,8 +55,6 @@ def evaluate_classifier(predictions, y):
         elif (predictions[i] != y[i] == 'Male'):
             false_negative += 1
 
-    # Interestingly, there were no true positives or false negatives. False positive rate = 1 - true positive rate
-    # This means that only Males were predicted with our trained classifier
     true_positive_rate = true_positive / len(y)
     true_negative_rate = true_negative / len(y)
     false_positive_rate = false_positive / len(y)
@@ -79,6 +77,8 @@ model.fit(x, y)
 predictions = model.predict(x)
 
 evaluate_classifier(predictions, y)
+# Note: Our classifier got worse. Our BER is higher because we are classifying a lot of men as women,
+# Because most who took the survey were men
 # In order of true positive rate, true negative rate, false positive rate, false negative rate, balanced error rate
 # (0.00975346762730971, 0.41283144635592806, 0.0053423516149585844, 0.5720727344018036, 0.2887075430083811)
 
@@ -105,5 +105,6 @@ model.fit(x, y)
 predictions = model.predict(x)
 
 print(evaluate_classifier(predictions, y))
+# Note: Performed worse for true positive
 # In order of true positive rate, true negative rate, false positive rate, false negative rate, balanced error rate
 # (0.0032348184090574914, 0.7855707493995981, 0.011861000833210802, 0.1993334313581336, 0.10559721609567221)
