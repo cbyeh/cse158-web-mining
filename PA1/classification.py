@@ -50,23 +50,27 @@ def evaluate_classifier(predictions, y):
             true_positive += 1
         elif (predictions[i] == y[i] == 'Male'):
             true_negative += 1
-        elif (predictions[i] != y[i] == 'Female'):
-            false_positive += 1
         elif (predictions[i] != y[i] == 'Male'):
+            false_positive += 1
+        elif (predictions[i] != y[i] == 'Female'):
             false_negative += 1
 
-    rates = []
-    for sum in [true_positive, true_negative, false_positive, false_negative]:
-        rates.append(sum / len(y))
-    rates.append((false_positive / len(y) +
-                  false_negative / len(y)) / 2)
+    true_positive_rate = 0 if true_positive == 0 else true_positive / \
+        (true_positive + false_negative)
+    true_negative_rate = 0 if true_negative == 0 else true_negative / \
+        (true_negative + false_positive)
+    false_positive_rate = 0 if false_positive == 0 else false_positive / \
+        (false_positive + true_negative)
+    false_negative_rate = 0 if false_negative == 0 else false_negative / \
+        (true_positive + false_negative)
+    balanced_error_rate = (false_positive_rate + false_negative_rate) / 2
 
-    return tuple(rates)
+    return (true_positive_rate, true_negative_rate, false_positive_rate, false_negative_rate, balanced_error_rate)
 
 
-evaluate_classifier(predictions, y)
+print(evaluate_classifier(predictions, y))
 # In order of true positive rate, true negative rate, false positive rate, false negative rate, balanced error rate
-# (0.0, 0.9849041807577317, 0.015095819242268294, 0.0, 0.007547909621134147)
+# (0, 1.0, 0, 1.0, 0.5)
 
 
 """Begin question 8"""
@@ -76,11 +80,10 @@ model = linear_model.LogisticRegression(class_weight='balanced')
 model.fit(x, y)
 predictions = model.predict(x)
 
-evaluate_classifier(predictions, y)
-# Note: Our classifier got worse. Our BER is higher because we are classifying a lot of men as women,
-# Because most who took the survey were men
+print(evaluate_classifier(predictions, y))
+# Our error rate got better
 # In order of true positive rate, true negative rate, false positive rate, false negative rate, balanced error rate
-# (0.00975346762730971, 0.41283144635592806, 0.0053423516149585844, 0.5720727344018036, 0.2887075430083811)
+# (0.6461038961038961, 0.4191589947748196, 0.5808410052251803, 0.3538961038961039, 0.4673685545606421)
 
 
 """Begin question 9"""
@@ -90,8 +93,7 @@ def _more_features_feature(datum):
     """Return a vector of multiple features that may help
     classify a female better
     """
-    feat = [1, len(datum['review/text']), float(datum['beer/beerId']),
-            float(datum['beer/brewerId']), datum['review/overall'],
+    feat = [1, len(datum['review/text']), datum['review/overall'],
             datum['review/palate'], datum['review/taste'],
             datum['review/appearance'], datum['review/aroma']]
     return feat
