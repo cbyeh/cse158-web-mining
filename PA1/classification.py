@@ -55,13 +55,13 @@ def evaluate_classifier(predictions, y):
         elif (predictions[i] != y[i] == 'Male'):
             false_negative += 1
 
-    true_positive_rate = true_positive / len(y)
-    true_negative_rate = true_negative / len(y)
-    false_positive_rate = false_positive / len(y)
-    false_negative_rate = false_negative / len(y)
-    balanced_error_rate = (false_positive_rate + false_negative_rate) / 2
+    rates = []
+    for sum in [true_positive, true_negative, false_positive, false_negative]:
+        rates.append(sum / len(y))
+    rates.append((false_positive / len(y) +
+                  false_negative / len(y)) / 2)
 
-    return (true_positive_rate, true_negative_rate, false_positive_rate, false_negative_rate, balanced_error_rate)
+    return tuple(rates)
 
 
 evaluate_classifier(predictions, y)
