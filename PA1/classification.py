@@ -43,7 +43,7 @@ def evaluate_classifier(predictions, y):
     true_positive = 0  # Correctly guessed as female
     true_negative = 0  # Correctly guessed as male
     false_positive = 0  # Incorrectly guessed as female
-    false_negative = 0  # Correctly guessed as male
+    false_negative = 0  # Incorrectly guessed as male
 
     for i in range(len(y)):
         if (predictions[i] == y[i] == 'Female'):
