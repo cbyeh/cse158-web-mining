@@ -76,34 +76,34 @@ def count_freq_words(datum):
     for w in words:
         if w in top_1000_words:
             count += 1
-    return count
+    return [1, count]
 
 
 # Train data
-x = np.array([count_freq_words(d) for d in training_data]).reshape(-1, 1)
+x = [count_freq_words(d) for d in training_data]
 y = [d['genreID'] for d in training_data]
-model = linear_model.LogisticRegression(max_iter=10000)
+model = linear_model.LogisticRegression(
+    class_weight='balanced', max_iter=10000)
 model.fit(x, y)
 
 # Evaluate data
-x_validation = np.array([count_freq_words(d)
-                         for d in validation_data]).reshape(-1, 1)
+x_validation = [count_freq_words(d) for d in validation_data]
 y_validation = [d['genreID'] for d in validation_data]
 predictions = model.predict(x_validation)
 correct = 0
 for i in range(len(y_validation)):
     if predictions[i] == y_validation[i]:
         correct += 1
-accuracy = correct / len(y)
-print(accuracy)  # 0.033503030303030305
+accuracy = correct / len(y_validation)
+print(accuracy)  # 0.08
 
 
 """Begin question 8"""
 
 
 # Try with top 200 words
-top_200_words = dict(sorted(
-    word_count.items(), key=itemgetter(1), reverse=True)[:200])
+top_100_words = dict(sorted(
+    word_count.items(), key=itemgetter(1), reverse=True)[:100])
 
 
 def count_freq_words_less(datum):
@@ -114,37 +114,37 @@ def count_freq_words_less(datum):
     words = t.strip().split()  # Tokenizes
     count = 0
     for w in words:
-        if w in top_200_words:
+        if w in top_100_words:
             count += 1
-    return count
+    return [1, count]
 
 
-# Try with C=10
-x = np.array([count_freq_words_less(d) for d in training_data]).reshape(-1, 1)
-x_validation = np.array([count_freq_words_less(d)
-                         for d in validation_data]).reshape(-1, 1)
-model = linear_model.LogisticRegression(max_iter=10000)
+# Try with less words
+x = [count_freq_words_less(d) for d in training_data]
+x_validation = [count_freq_words_less(d) for d in validation_data]
+model = linear_model.LogisticRegression(
+    class_weight='balanced', max_iter=10000)
 model.fit(x, y)
 predictions = model.predict(x_validation)
 correct = 0
 for i in range(len(y_validation)):
     if predictions[i] == y_validation[i]:
         correct += 1
-accuracy = correct / len(y)
+accuracy = correct / len(y_validation)
 print(accuracy)  # 0.033503030303030305
 
 # Write output
 print("Writing to predictions_Category.txt")
 output = open("data/predictions_Category.txt", 'w')
 data = []
-for d in read_JSON("data/train_Category.json.gz"):
+for d in read_JSON("data/test_Category.json.gz"):
     data.append(d)
-x_test = np.array([count_freq_words_less(d)
-                   for d in validation_data]).reshape(-1, 1)
-y_test = [d['genreID'] for d in training_data]
-model = linear_model.LogisticRegression(max_iter=10000)
+x_test = [count_freq_words_less(d) for d in data]
+model = linear_model.LogisticRegression(
+    class_weight='balanced', max_iter=10000)
 model.fit(x, y)
 predictions = model.predict(x_test)
+output.write("userID-reviewID,prediction\n")
 for i in range(len(x_test)):
     user = data[i]['userID']
     review = data[i]['reviewID']
