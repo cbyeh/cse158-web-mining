@@ -231,4 +231,4 @@ for l in open("data/pairs_Played.txt"):
         pred = 0
     predictions.write(user + '-' + game + "," + str(pred) + "\n")
 predictions.close()
-# Kaggle username: Christopher Yeh
+# Kaggle username: christopheryeh

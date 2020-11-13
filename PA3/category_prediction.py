@@ -66,24 +66,27 @@ print(top_10)
 """Begin question 7"""
 
 
+wordID = dict(zip(top_1000_words, range(len(top_1000_words))))
+
+
 def count_freq_words(datum):
+    feat = [0] * len(top_1000_words)
     t = datum['text']
     t = t.lower()
     t = [c for c in t if not (c in punct)]  # Non-punct characters
     t = ''.join(t)  # Convert back to string
     words = t.strip().split()  # Tokenizes
-    count = 0
     for w in words:
         if w in top_1000_words:
-            count += 1
-    return [1, count]
+            feat[wordID[w]] += 1
+    feat.append(1)
+    return feat
 
 
 # Train data
 x = [count_freq_words(d) for d in training_data]
 y = [d['genreID'] for d in training_data]
-model = linear_model.LogisticRegression(
-    class_weight='balanced', max_iter=10000)
+model = linear_model.LogisticRegression(max_iter=10000)
 model.fit(x, y)
 
 # Evaluate data
@@ -95,35 +98,37 @@ for i in range(len(y_validation)):
     if predictions[i] == y_validation[i]:
         correct += 1
 accuracy = correct / len(y_validation)
-print(accuracy)  # 0.08
+print(accuracy)  # 0.6723
 
 
 """Begin question 8"""
 
 
-# Try with top 200 words
-top_100_words = dict(sorted(
-    word_count.items(), key=itemgetter(1), reverse=True)[:100])
+# Try with top 1500 words
+top_1500_words = dict(sorted(
+    word_count.items(), key=itemgetter(1), reverse=True)[:1500])
+
+wordID = dict(zip(top_1500_words, range(len(top_1500_words))))
 
 
-def count_freq_words_less(datum):
+def count_freq_words_more(datum):
+    feat = [0] * len(top_1500_words)
     t = datum['text']
     t = t.lower()
     t = [c for c in t if not (c in punct)]  # Non-punct characters
     t = ''.join(t)  # Convert back to string
     words = t.strip().split()  # Tokenizes
-    count = 0
     for w in words:
-        if w in top_100_words:
-            count += 1
-    return [1, count]
+        if w in top_1500_words:
+            feat[wordID[w]] += 1
+    feat.append(1)
+    return feat
 
 
-# Try with less words
-x = [count_freq_words_less(d) for d in training_data]
-x_validation = [count_freq_words_less(d) for d in validation_data]
-model = linear_model.LogisticRegression(
-    class_weight='balanced', max_iter=10000)
+# Try with more words
+x = [count_freq_words_more(d) for d in training_data]
+x_validation = [count_freq_words_more(d) for d in validation_data]
+model = linear_model.LogisticRegression(max_iter=10000)
 model.fit(x, y)
 predictions = model.predict(x_validation)
 correct = 0
@@ -131,7 +136,7 @@ for i in range(len(y_validation)):
     if predictions[i] == y_validation[i]:
         correct += 1
 accuracy = correct / len(y_validation)
-print(accuracy)  # 0.033503030303030305
+print(accuracy)  # 0.6927
 
 # Write output
 print("Writing to predictions_Category.txt")
@@ -139,9 +144,8 @@ output = open("data/predictions_Category.txt", 'w')
 data = []
 for d in read_JSON("data/test_Category.json.gz"):
     data.append(d)
-x_test = [count_freq_words_less(d) for d in data]
-model = linear_model.LogisticRegression(
-    class_weight='balanced', max_iter=10000)
+x_test = [count_freq_words_more(d) for d in data]
+model = linear_model.LogisticRegression(max_iter=10000)
 model.fit(x, y)
 predictions = model.predict(x_test)
 output.write("userID-reviewID,prediction\n")
@@ -151,4 +155,4 @@ for i in range(len(x_test)):
     pred = predictions[i]
     output.write(user + '-' + review + "," + str(pred) + "\n")
 output.close()
-# Kaggle username: Christopher Yeh
+# Kaggle username: christopheryeh
