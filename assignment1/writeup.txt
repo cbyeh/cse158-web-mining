@@ -1,0 +1,20 @@
+Kaggle username: christopheryeh
+Team name: Christopher Yeh
+
+For play prediction, I decided to use a poplarity threshold as from PA3. The reasoning behind this is that if a game is popular, the more likely a user is to play it. I did this by adding every game of a certain popularity percentile into a set, and if a game is in that set, predict that the user would play it.
+
+Along with this I used jaccard similarity which returns a value that can represent how likely a game is played compared to other users who have also played that game. I chose this method as well as if there are a good amount of other users with the user’s same tastes, the more likely a user would be to play the game.
+To predict this, for each data point, I checked every game that the user has played.
+I got the max of the jaccard similarity of all those games and other users who have played those games, and if it was within range of a threshold, I predicted true.
+
+I ended up predicting whether the game was possible OR if the jaccard similarity was enough.
+
+To optimize play prediction, I ran multiple tests with different jaccard and popularity thresholds.
+I ran population from the range of 40% to 95% and jaccard from 0.01 to 0.045.
+I found the optimal to be jaccard 0.045 with a popularity threshold of top 65%
+
+
+For category prediction to predict a game's category (action, RPG, etc) I trained a logistic regressor. The features were the count of the most common words found for all the reviews in the training set. I chose this because reviews for specific genres may have similar words, such as keywords “Explore”, “Magic” to describe genres adventure and RPG respectively.
+After I found the most common words, to predict a category, in that game's review, I would count how many occurrences of the most common words appeared, and used each as a feature for the logistic regressor.
+
+I found that the more common words I included as features, the more accurate the predictor was. So I ended up using a large amount of features, around 3000.
