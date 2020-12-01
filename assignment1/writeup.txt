@@ -1,7 +1,7 @@
 Kaggle username: christopheryeh
 Team name: Christopher Yeh
 
-For play prediction, I decided to use a poplarity threshold as from PA3. The reasoning behind this is that if a game is popular, the more likely a user is to play it. I did this by adding every game of a certain popularity percentile into a set, and if a game is in that set, predict that the user would play it.
+For play prediction, I decided to use a popularity threshold as from PA3. The reasoning behind this is that if a game is popular, the more likely a user is to play it. I did this by adding every game of a certain popularity percentile into a set, and if a game is in that set, predict that the user would play it.
 
 Along with this I used jaccard similarity which returns a value that can represent how likely a game is played compared to other users who have also played that game. I chose this method as well as if there are a good amount of other users with the user’s same tastes, the more likely a user would be to play the game.
 To predict this, for each data point, I checked every game that the user has played.
